@@ -1,0 +1,90 @@
+import { Avatar, List } from 'antd';
+import { motion } from 'framer-motion';
+import moment from 'moment';
+import { BsInbox } from 'react-icons/bs';
+import { useNavigate } from 'react-router-dom';
+import { useAppSelector } from '../../app/hooks';
+import { selectUser } from '../../features/auth/authSlice';
+import { useGetConversationsQuery } from '../../features/chat/chatApi';
+import { Conversation, User } from '../../types/Types';
+import getSender from '../../utils/getSender';
+
+const ChatList: React.FC = () => {
+    const user = useAppSelector(selectUser) as User;
+
+    const {
+        data: conversations,
+        isSuccess,
+        isLoading,
+    } = useGetConversationsQuery();
+
+    const navigate = useNavigate();
+
+    const handleConversationClick = (conversation: Conversation) => {
+        navigate(`/t/${conversation._id}`);
+    };
+
+    return (
+        <List
+            dataSource={conversations}
+            loading={isLoading}
+            locale={{
+                emptyText: (
+                    <div className="flex flex-col items-center justify-center p-4 gap-4">
+                        <BsInbox className="text-blue-500 text-5xl" />
+                        <span className="text-gray-700">
+                            No conversations yet
+                        </span>
+                    </div>
+                ),
+            }}
+            renderItem={(conversation) => (
+                <List.Item
+                    key={conversation._id}
+                    className="hover:bg-gray-100 !p-0"
+                    onClick={() => handleConversationClick(conversation)}
+                >
+                    <motion.div
+                        layout
+                        className="flex items-center w-full px-4 cursor-pointer hover:bg-gray-100 py-2"
+                    >
+                        <div>
+                            <Avatar
+                                size={48}
+                                src={getSender(conversation, user).picture}
+                                style={{
+                                    backgroundColor: conversation.avatarColor,
+                                }}
+                            >
+                                {getSender(conversation, user)
+                                    .name.charAt(0)
+                                    .toUpperCase()}
+                            </Avatar>
+                        </div>
+                        <div className="ml-3 w-full">
+                            <h4 className="text-base font-semibold">
+                                {getSender(conversation, user).name}
+                            </h4>
+                            <div className="flex justify-between items-center">
+                                <p className="text-sm text-gray-500">
+                                    {conversation.lastMessage.message.length >
+                                    30
+                                        ? conversation.lastMessage.message.slice(
+                                              0,
+                                              30
+                                          ) + '...'
+                                        : conversation.lastMessage.message}
+                                </p>
+                                <span className="text-xs">
+                                    {moment(conversation.updatedAt).fromNow()}
+                                </span>
+                            </div>
+                        </div>
+                    </motion.div>
+                </List.Item>
+            )}
+        />
+    );
+};
+
+export default ChatList;
