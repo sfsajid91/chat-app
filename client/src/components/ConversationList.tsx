@@ -12,7 +12,6 @@ const ConversationList: React.FC = () => {
     const params = useParams() as { conversationId: string };
     const [value, setValue] = useState('');
     const [search, setSearch] = useState('');
-    const [isModalOpen, setIsModalOpen] = useState(false);
 
     // debouncing the search
     useEffect(() => {

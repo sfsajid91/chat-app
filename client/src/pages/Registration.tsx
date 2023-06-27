@@ -1,6 +1,7 @@
 import { Alert, Button, Col, Form, Input, Row } from 'antd';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { BsGoogle } from 'react-icons/bs';
 import { Link, useNavigate } from 'react-router-dom';
 import { useRegisterMutation } from '../features/auth/authApi';
@@ -28,7 +29,6 @@ export default function Registration() {
         };
 
         register(credentials);
-        console.log('here');
     };
 
     useEffect(() => {
@@ -45,6 +45,9 @@ export default function Registration() {
 
     return (
         <div className="overflow-x-hidden overflow-y-auto">
+            <Helmet>
+                <title>Registration | Chat App</title>
+            </Helmet>
             <nav className="px-8 py-2 w-full sticky top-0 border-b bg-white bg-opacity-40 backdrop-blur-sm">
                 <div className="w-96">
                     <img

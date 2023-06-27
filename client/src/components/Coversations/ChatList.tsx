@@ -12,11 +12,7 @@ import getSender from '../../utils/getSender';
 const ChatList: React.FC = () => {
     const user = useAppSelector(selectUser) as User;
 
-    const {
-        data: conversations,
-        isSuccess,
-        isLoading,
-    } = useGetConversationsQuery();
+    const { data: conversations, isLoading } = useGetConversationsQuery();
 
     const navigate = useNavigate();
 

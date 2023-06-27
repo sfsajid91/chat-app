@@ -1,5 +1,6 @@
 import { Alert, Button, Form, Input } from 'antd';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 import { BsGoogle } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
 import { useLoginMutation } from '../features/auth/authApi';
@@ -24,6 +25,9 @@ export default function Login() {
 
     return (
         <div className="overflow-x-hidden">
+            <Helmet>
+                <title>Login | Chat App</title>
+            </Helmet>
             <nav className="px-8 py-2 w-full sticky top-0 border-b bg-white bg-opacity-40 backdrop-blur-sm">
                 <div className="w-96">
                     <img

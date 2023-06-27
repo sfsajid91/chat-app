@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Outlet, useParams } from 'react-router-dom';
 import ConversationList from '../components/ConversationList';
 import EmptyConversation from '../components/EmptyConversation';
@@ -32,6 +33,9 @@ export default function Chat() {
 
     return (
         <>
+            <Helmet>
+                <title>Conversations | Chat App</title>
+            </Helmet>
             {isLoading && (
                 <div className="sticky top-0 left-0 w-full h-[0.2rem] bg-white z-50 overflow-hidden">
                     {/* <div className="h-full bg-blue-500 animate-[loading_1s_ease-in-out_infinite]" /> */}

@@ -1,5 +1,6 @@
 import { Avatar } from 'antd';
 import React, { useRef } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { BsArrowLeftShort } from 'react-icons/bs';
 import { Link, useOutletContext } from 'react-router-dom';
 import { useAppSelector } from '../app/hooks';
@@ -29,6 +30,9 @@ const Conversation: React.FC = () => {
 
     return (
         <div className="w-full h-full">
+            <Helmet>
+                <title>{getSender(conversation, user)?.name} | Chat App</title>
+            </Helmet>
             {/* top nav  */}
             <nav className="w-full px-4 py-2 shadow flex items-center gap-4 sticky top-0 bg-white z-20">
                 <Link
