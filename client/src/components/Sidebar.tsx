@@ -1,5 +1,5 @@
 import type { MenuProps } from 'antd';
-import { Avatar, Button, Dropdown, Layout, Menu, message } from 'antd';
+import { Avatar, Badge, Button, Dropdown, Layout, Menu, message } from 'antd';
 import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 import {
@@ -14,6 +14,7 @@ import { useAppSelector } from '../app/hooks';
 import { store } from '../app/store';
 import apiSlice from '../features/api/apiSlice';
 import { selectUser, userLoggedOut } from '../features/auth/authSlice';
+import type { User } from '../types/Types';
 
 const { Sider } = Layout;
 
@@ -44,7 +45,7 @@ const Sidebar: React.FC = () => {
     const params = useParams() as { conversationId: string };
     const [collapsed, setCollapsed] = useState(true);
 
-    const user = useAppSelector(selectUser);
+    const user = useAppSelector(selectUser) as User;
 
     const toggleCollapsed = () => {
         setCollapsed(!collapsed);
@@ -86,16 +87,23 @@ const Sidebar: React.FC = () => {
                     >
                         <div className="flex gap-1 items-center cursor-pointer hover:bg-gray-100 duration-300 px-2.5 py-1.5 rounded">
                             <motion.div layout>
-                                <Avatar
-                                    size={40}
-                                    style={{
-                                        backgroundColor: '#f56a00',
-                                    }}
-                                    src={user?.picture}
+                                <Badge
+                                    dot
+                                    status="success"
+                                    offset={[-8, 34]}
+                                    title="Online"
                                 >
-                                    {user.name.split(' ')[0][0] +
-                                        user.name.split(' ')[1][0]}
-                                </Avatar>
+                                    <Avatar
+                                        size={40}
+                                        style={{
+                                            backgroundColor: '#f56a00',
+                                        }}
+                                        src={user?.picture}
+                                    >
+                                        {user.name.split(' ')[0][0] +
+                                            user.name.split(' ')[1][0]}
+                                    </Avatar>
+                                </Badge>
                             </motion.div>
                             {!collapsed && (
                                 <motion.div

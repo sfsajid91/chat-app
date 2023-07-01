@@ -202,14 +202,8 @@ const sendMessage = async (req, res, next) => {
             });
         }
 
-        const randomColor = () => {
-            const random = Math.floor(Math.random() * 16777215).toString(16);
-            return `#${random}`;
-        };
-
         const newConversation = new Conversation({
             participants: [req.user._id, receiver._id],
-            avatarColor: randomColor(),
         });
 
         const savedConversation = await newConversation.save();

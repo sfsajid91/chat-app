@@ -1,13 +1,40 @@
 import { Button, Form, Input } from 'antd';
+import { useEffect, useState } from 'react';
 import { IoSendSharp } from 'react-icons/io5';
-import { useSendMessageMutation } from '../../features/chat/chatApi';
+import { socket, useSendMessageMutation } from '../../features/chat/chatApi';
 
 interface BottomNavProps {
     receiver: string;
+    conversationId: string;
 }
 
-const BottomNav = ({ receiver }: BottomNavProps) => {
+const BottomNav = ({ receiver, conversationId }: BottomNavProps) => {
     const [form] = Form.useForm();
+    const message = Form.useWatch('message', form);
+
+    const [isTyping, setIsTyping] = useState(false);
+
+    // debounce typing event when user is typing set isTyping to true after typing stops for 1 second set isTyping to false
+    useEffect(() => {
+        if (!isTyping && message) {
+            setIsTyping(true);
+        }
+
+        if (!message) {
+            setIsTyping(false);
+        }
+
+        const timeout2 = setTimeout(() => {
+            setIsTyping(false);
+        }, 2000);
+        return () => {
+            clearTimeout(timeout2);
+        };
+    }, [message]);
+
+    useEffect(() => {
+        socket.emit('typing', isTyping, conversationId);
+    }, [isTyping]);
 
     const [sendMessage, { isLoading }] = useSendMessageMutation();
 
@@ -22,9 +49,10 @@ const BottomNav = ({ receiver }: BottomNavProps) => {
         };
         sendMessage(data);
     };
+
     return (
         <>
-            <nav className="w-full px-4 py-2 border-t flex items-center sticky -bottom-2 bg-white z-20">
+            <nav className="h-14 w-full px-4 py-2 border-t flex items-center bg-white z-20">
                 <Form
                     form={form}
                     className="w-full flex"

@@ -25,10 +25,16 @@ const register = async (req, res, next) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        const randomColor = () => {
+            const random = Math.floor(Math.random() * 16777215).toString(16);
+            return `#${random}`;
+        };
+
         await User.create({
             name,
             email,
             password: hashedPassword,
+            avatarColor: randomColor(),
         });
 
         return res.status(201).json({
@@ -133,8 +139,6 @@ const googleController = async (req, res, next) => {
                 .split('.')
                 .join('+');
 
-            console.log(userToken);
-
             return res.redirect(
                 `${process.env.CLIENT_URL}/login/${token}/${userToken}`
             );
@@ -142,12 +146,18 @@ const googleController = async (req, res, next) => {
 
         const hashedId = await bcrypt.hash(req.user.id, 10);
 
+        const randomColor = () => {
+            const random = Math.floor(Math.random() * 16777215).toString(16);
+            return `#${random}`;
+        };
+
         const newUser = await User.create({
             name,
             email,
             googleId: sub,
             picture,
             password: hashedId,
+            avatarColor: randomColor(),
         });
 
         delete newUser._doc.password;

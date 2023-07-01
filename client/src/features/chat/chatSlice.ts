@@ -25,7 +25,7 @@ const chatSlice = createSlice({
             state.isModalOpen = action.payload;
         },
 
-        setCurrentRecipient(state, action: PayloadAction<User>) {
+        setCurrentRecipient(state, action: PayloadAction<User | null>) {
             state.currentRecipient = action.payload;
         },
     },

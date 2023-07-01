@@ -1,4 +1,4 @@
-import { Avatar, List } from 'antd';
+import { Avatar, Badge, List } from 'antd';
 import { motion } from 'framer-motion';
 import moment from 'moment';
 import { BsInbox } from 'react-icons/bs';
@@ -12,7 +12,8 @@ import getSender from '../../utils/getSender';
 const ChatList: React.FC = () => {
     const user = useAppSelector(selectUser) as User;
 
-    const { data: conversations, isLoading } = useGetConversationsQuery();
+    const { data: conversations, isLoading } =
+        useGetConversationsQuery(undefined);
 
     const navigate = useNavigate();
 
@@ -45,17 +46,37 @@ const ChatList: React.FC = () => {
                         className="flex items-center w-full px-4 cursor-pointer hover:bg-gray-100 py-2"
                     >
                         <div>
-                            <Avatar
-                                size={48}
-                                src={getSender(conversation, user).picture}
-                                style={{
-                                    backgroundColor: conversation.avatarColor,
-                                }}
+                            <Badge
+                                dot
+                                status={
+                                    getSender(conversation, user).activeStatus
+                                        .status
+                                        ? 'success'
+                                        : 'error'
+                                }
+                                offset={[-8, 40]}
+                                title={
+                                    getSender(conversation, user).activeStatus
+                                        .status
+                                        ? 'Online'
+                                        : 'Offline'
+                                }
                             >
-                                {getSender(conversation, user)
-                                    .name.charAt(0)
-                                    .toUpperCase()}
-                            </Avatar>
+                                <Avatar
+                                    size={48}
+                                    src={getSender(conversation, user).picture}
+                                    style={{
+                                        backgroundColor: getSender(
+                                            conversation,
+                                            user
+                                        ).avatarColor,
+                                    }}
+                                >
+                                    {getSender(conversation, user)
+                                        .name.charAt(0)
+                                        .toUpperCase()}
+                                </Avatar>
+                            </Badge>
                         </div>
                         <div className="ml-3 w-full">
                             <h4 className="text-base font-semibold">

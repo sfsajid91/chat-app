@@ -1,4 +1,4 @@
-import { Avatar, Input, Modal } from 'antd';
+import { Avatar, Badge, Input, Modal } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
@@ -32,7 +32,7 @@ const MessageModal: React.FC = () => {
     const handleOk = () => {
         sendMessage({
             message: value.trim(),
-            receiverEmail: currentRecipient?.email,
+            receiverEmail: currentRecipient?.email as string,
         });
     };
 
@@ -57,13 +57,30 @@ const MessageModal: React.FC = () => {
                 confirmLoading={isLoading}
             >
                 <div className="flex items-center gap-2 mb-2">
-                    <Avatar
-                        size={48}
-                        src={currentRecipient?.picture}
-                        style={{ backgroundColor: '#87d068' }}
+                    <Badge
+                        dot
+                        status={
+                            currentRecipient?.activeStatus.status
+                                ? 'success'
+                                : 'error'
+                        }
+                        offset={[-8, 40]}
+                        title={
+                            currentRecipient?.activeStatus.status
+                                ? 'Online'
+                                : 'Offline'
+                        }
                     >
-                        {currentRecipient?.name.charAt(0).toUpperCase()}
-                    </Avatar>
+                        <Avatar
+                            size={48}
+                            src={currentRecipient?.picture}
+                            style={{
+                                backgroundColor: currentRecipient?.avatarColor,
+                            }}
+                        >
+                            {currentRecipient?.name.charAt(0).toUpperCase()}
+                        </Avatar>
+                    </Badge>
                     <span className="text-lg font-semibold">
                         {currentRecipient?.name}
                     </span>

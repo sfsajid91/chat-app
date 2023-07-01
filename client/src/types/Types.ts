@@ -3,6 +3,11 @@ export interface User {
     name: string;
     email: string;
     picture?: string;
+    activeStatus: {
+        status: boolean;
+        lastSeen?: string;
+    };
+    avatarColor: string;
 }
 
 export interface Conversation {
@@ -12,7 +17,6 @@ export interface Conversation {
         message: string;
         updatedAt: string;
     };
-    avatarColor: string;
     createdAt: string;
     updatedAt: string;
 }

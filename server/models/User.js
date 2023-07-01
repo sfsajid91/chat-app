@@ -9,7 +9,6 @@ const userSchema = new mongoose.Schema(
         email: {
             type: String,
             required: true,
-            // unique: true,
         },
         password: {
             type: String,
@@ -20,6 +19,20 @@ const userSchema = new mongoose.Schema(
         },
         picture: {
             type: String,
+        },
+        avatarColor: {
+            type: String,
+            required: true,
+        },
+        activeStatus: {
+            status: {
+                type: Boolean,
+                default: false,
+                required: true,
+            },
+            lastSeen: {
+                type: Date,
+            },
         },
     },
     {

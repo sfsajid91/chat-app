@@ -1,4 +1,4 @@
-import { Avatar, List } from 'antd';
+import { Avatar, Badge, List } from 'antd';
 import { motion } from 'framer-motion';
 import { BsInbox } from 'react-icons/bs';
 import { useAppDispatch } from '../../app/hooks';
@@ -51,9 +51,30 @@ const UsersList = ({ search }: Props) => {
                             className="flex items-center w-full px-4 cursor-pointer hover:bg-gray-100 py-2"
                         >
                             <div>
-                                <Avatar size={48} src={user.picture}>
-                                    {user.name.charAt(0).toUpperCase()}
-                                </Avatar>
+                                <Badge
+                                    dot
+                                    status={
+                                        user.activeStatus.status
+                                            ? 'success'
+                                            : 'error'
+                                    }
+                                    offset={[-8, 40]}
+                                    title={
+                                        user.activeStatus.status
+                                            ? 'Online'
+                                            : 'Offline'
+                                    }
+                                >
+                                    <Avatar
+                                        size={48}
+                                        src={user.picture}
+                                        style={{
+                                            backgroundColor: user.avatarColor,
+                                        }}
+                                    >
+                                        {user.name.charAt(0).toUpperCase()}
+                                    </Avatar>
+                                </Badge>
                             </div>
                             <div className="ml-3 w-full">
                                 <h4 className="text-base font-semibold">

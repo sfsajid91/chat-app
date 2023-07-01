@@ -1,12 +1,19 @@
 import { message } from 'antd';
 import { io } from 'socket.io-client';
+import { store } from '../../app/store';
 import { Conversation, Message, User } from '../../types/Types';
 import getReceiver from '../../utils/getReceiver';
+import { isValidObjectId } from '../../utils/isValidObjectId';
 import apiSlice from '../api/apiSlice';
 
 interface GetMessagesResponse {
     conversation: Conversation;
     messages: Message[];
+}
+
+interface SendMessageRequest {
+    message: string;
+    receiverEmail: string;
 }
 
 interface SendMessageResponse {
@@ -19,7 +26,7 @@ const socketData = {
     connected: false,
 };
 
-const socket = io(import.meta.env.VITE_WEBSOCKET_URL, {
+export const socket = io(import.meta.env.VITE_WEBSOCKET_URL, {
     transports: ['websocket'],
     reconnection: true,
     reconnectionDelay: 1000,
@@ -30,11 +37,11 @@ const socket = io(import.meta.env.VITE_WEBSOCKET_URL, {
 
 export const chatApi = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-        getConversations: builder.query<Conversation[], void[]>({
+        getConversations: builder.query<Conversation[], undefined>({
             query: () => '/chat',
 
             async onCacheEntryAdded(
-                arg,
+                _arg,
                 { cacheDataLoaded, getState, dispatch }
             ) {
                 try {
@@ -93,25 +100,86 @@ export const chatApi = apiSlice.injectEndpoints({
                             }
                         }
                     );
+
+                    socket.on(
+                        'userUpdate',
+                        (user: User, conversationIds: { _id: string }[]) => {
+                            dispatch(
+                                chatApi.util.updateQueryData(
+                                    'getConversations',
+                                    undefined,
+                                    (draft) => {
+                                        const conversation = draft.findIndex(
+                                            (c) =>
+                                                c.participants.find(
+                                                    (p) => p._id === user._id
+                                                )
+                                        );
+                                        // delete the conversation if it exists and move it to the top
+                                        if (conversation !== -1) {
+                                            const oldConversation =
+                                                draft[conversation];
+                                            draft.splice(conversation, 1);
+                                            oldConversation.participants =
+                                                oldConversation.participants.map(
+                                                    (p) =>
+                                                        p._id === user._id
+                                                            ? user
+                                                            : p
+                                                );
+                                            draft.unshift(oldConversation);
+                                        }
+                                    }
+                                )
+                            );
+
+                            // TODO: this is cause lots of rerenders
+                            conversationIds.forEach(({ _id: id }) => {
+                                dispatch(
+                                    chatApi.util.updateQueryData(
+                                        'getConversation',
+                                        id,
+                                        (draft) => {
+                                            const conversation =
+                                                draft.conversation;
+                                            conversation.participants =
+                                                conversation.participants.map(
+                                                    (p) =>
+                                                        p._id === user._id
+                                                            ? user
+                                                            : p
+                                                );
+                                            draft.conversation = conversation;
+                                        }
+                                    )
+                                );
+                            });
+
+                            // delete all findUser cache
+                        }
+                    );
                 } catch (err) {
                     // console.log(err);
                 }
             },
         }),
 
-        getConversation: builder.query<GetMessagesResponse, any>({
+        getConversation: builder.query<
+            GetMessagesResponse,
+            Conversation['_id']
+        >({
             query: (id) => `/chat/${id}`,
         }),
 
-        sendMessage: builder.mutation<SendMessageResponse, any>({
-            query: (data: { message: string; receiverEmail: string }) => ({
+        sendMessage: builder.mutation<SendMessageResponse, SendMessageRequest>({
+            query: (data) => ({
                 url: `/chat`,
                 method: 'POST',
                 body: data,
             }),
 
             // pessimistic update with type
-            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+            async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
                 try {
                     if (!socketData.connected) {
                         message.error('Waiting for connection...');
@@ -172,6 +240,10 @@ socket.on('disconnect', () => {
 socket.on('connect', () => {
     if (!socketData.firstConnection) {
         message.success('Connection restored.');
+    }
+    const userId = store.getState().auth.user?._id;
+    if (userId && isValidObjectId(userId)) {
+        socket.emit('online', userId);
     }
     socketData.firstConnection = false;
     socketData.connected = true;

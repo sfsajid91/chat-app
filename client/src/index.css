@@ -96,3 +96,31 @@
         margin-top: 0;
     }
 }
+
+.typing {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: block;
+    margin: 15px auto;
+    margin-left: 52px;
+    position: relative;
+    color: #fff;
+    box-sizing: border-box;
+    animation: animloader 1s linear infinite alternate;
+}
+
+@keyframes animloader {
+    0% {
+        box-shadow: -36px -6px, -12px 6px, 12px -6px;
+    }
+    33% {
+        box-shadow: -36px 6px, -12px -6px, 12px 6px;
+    }
+    66% {
+        box-shadow: -36px -6px, -12px 6px, 12px -6px;
+    }
+    100% {
+        box-shadow: -36px 6px, -12px -6px, 12px 6px;
+    }
+}

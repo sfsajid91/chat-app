@@ -6,17 +6,12 @@ import ConversationList from '../components/ConversationList';
 import EmptyConversation from '../components/EmptyConversation';
 import Sidebar from '../components/Sidebar';
 import { useGetConversationQuery } from '../features/chat/chatApi';
+import { isValidObjectId } from '../utils/isValidObjectId';
 
 export default function Chat() {
     const { conversationId } = useParams() as { conversationId: string };
 
     const [apiData, setApiData] = useState<string | null>(null);
-
-    // function for checking mongoose object id
-    const isValidObjectId = (id: string) => {
-        const checkForHexRegExp = new RegExp('^[0-9a-fA-F]{24}$');
-        return checkForHexRegExp.test(id);
-    };
 
     const { isError, isSuccess, isLoading, data } = useGetConversationQuery(
         conversationId,
@@ -36,6 +31,8 @@ export default function Chat() {
             <Helmet>
                 <title>Conversations | Chat App</title>
             </Helmet>
+
+            {/* Loading bar */}
             {isLoading && (
                 <div className="sticky top-0 left-0 w-full h-[0.2rem] bg-white z-50 overflow-hidden">
                     {/* <div className="h-full bg-blue-500 animate-[loading_1s_ease-in-out_infinite]" /> */}
