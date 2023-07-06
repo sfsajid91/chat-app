@@ -15,7 +15,12 @@ const getAllConversations = async (req, res, next) => {
         })
             .populate({
                 path: 'lastMessage',
-                select: 'message updatedAt',
+                select: {
+                    message: 1,
+                    updatedAt: 1,
+                    seen: 1,
+                    sender: 1,
+                },
             })
             .populate({
                 path: 'participants',
@@ -57,7 +62,12 @@ const getAllMessages = async (req, res, next) => {
         const conversation = await Conversation.findOne({ _id: conversationId })
             .populate({
                 path: 'lastMessage',
-                select: 'message updatedAt',
+                select: {
+                    message: 1,
+                    updatedAt: 1,
+                    seen: 1,
+                    sender: 1,
+                },
             })
             .populate({
                 path: 'participants',
@@ -175,6 +185,8 @@ const sendMessage = async (req, res, next) => {
                     select: {
                         message: 1,
                         updatedAt: 1,
+                        seen: 1,
+                        sender: 1,
                     },
                 })
                 .populate({
@@ -229,6 +241,8 @@ const sendMessage = async (req, res, next) => {
                 select: {
                     message: 1,
                     updatedAt: 1,
+                    seen: 1,
+                    sender: 1,
                 },
             })
             .populate({
@@ -259,6 +273,44 @@ const sendMessage = async (req, res, next) => {
     }
 };
 
+const seenMessage = async (req, res, next) => {
+    try {
+        const { messageId } = req.params;
+
+        const message = await Message.findOne({
+            _id: messageId,
+        }).exec();
+
+        if (!message) {
+            return res.status(404).json({
+                message: 'Message not found',
+            });
+        }
+
+        if (message.seen) {
+            return res.status(400).json({
+                message: 'Message already seen',
+            });
+            // console.log('Message already seen');
+        }
+
+        if (message.sender.toString() === req.user._id.toString()) {
+            return res.status(403).json({
+                message: 'You are not allowed to mark this message as seen',
+            });
+        }
+
+        message.seen = true;
+        await message.save();
+
+        global.io.emit('messageSeen', message);
+
+        return res.status(201).json(message);
+    } catch (error) {
+        return next(error);
+    }
+};
+
 const searchUser = async (req, res, next) => {
     try {
         const { search } = req.query;
@@ -286,4 +338,5 @@ module.exports = {
     getAllMessages,
     sendMessage,
     searchUser,
+    seenMessage,
 };

@@ -21,6 +21,20 @@ const ChatList: React.FC = () => {
         navigate(`/t/${conversation._id}`);
     };
 
+    const formatDateTime = (isoDate: string) => {
+        const date = moment(isoDate);
+        const today = moment().startOf('day');
+        const startOfWeek = moment().startOf('isoWeek');
+
+        if (date.isSame(today, 'day')) {
+            return date.format('LT'); // Today: Return time only
+        } else if (date.isSameOrAfter(startOfWeek, 'day')) {
+            return date.format('dddd'); // Same week: Return day name
+        } else {
+            return date.format('ll'); // Other: Return full date
+        }
+    };
+
     return (
         <List
             dataSource={conversations}
@@ -82,7 +96,14 @@ const ChatList: React.FC = () => {
                             <h4 className="text-base font-semibold">
                                 {getSender(conversation, user).name}
                             </h4>
-                            <div className="flex justify-between items-center">
+                            <div
+                                className={`flex justify-between items-center ${
+                                    conversation.lastMessage.sender !==
+                                        user._id &&
+                                    !conversation.lastMessage.seen &&
+                                    'font-bold'
+                                }`}
+                            >
                                 <p className="text-sm text-gray-500">
                                     {conversation.lastMessage.message.length >
                                     30
@@ -93,7 +114,8 @@ const ChatList: React.FC = () => {
                                         : conversation.lastMessage.message}
                                 </p>
                                 <span className="text-xs">
-                                    {moment(conversation.updatedAt).fromNow()}
+                                    {/* if conversation.updatedAt is same week then show day if same day show time else show date */}
+                                    {formatDateTime(conversation.updatedAt)}
                                 </span>
                             </div>
                         </div>

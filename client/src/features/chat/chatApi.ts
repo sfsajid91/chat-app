@@ -158,6 +158,23 @@ export const chatApi = apiSlice.injectEndpoints({
                             // delete all findUser cache
                         }
                     );
+
+                    socket.on('messageSeen', (msg: Message) => {
+                        dispatch(
+                            chatApi.util.updateQueryData(
+                                'getConversation',
+                                msg.conversationId,
+                                (draft) => {
+                                    const seenMessage = draft.messages.find(
+                                        (m) => m._id === msg._id
+                                    );
+                                    if (seenMessage) {
+                                        seenMessage.seen = true;
+                                    }
+                                }
+                            )
+                        );
+                    });
                 } catch (err) {
                     // console.log(err);
                 }
@@ -181,11 +198,6 @@ export const chatApi = apiSlice.injectEndpoints({
             // pessimistic update with type
             async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
                 try {
-                    if (!socketData.connected) {
-                        message.error('Waiting for connection...');
-                        throw new Error('Socket is not connected');
-                    }
-
                     const result = await queryFulfilled;
 
                     // updating getConversations cache
@@ -228,13 +240,62 @@ export const chatApi = apiSlice.injectEndpoints({
 
         findUser: builder.query<User[], string>({
             query: (text) => `/chat/search?search=${text}`,
+            keepUnusedDataFor: 0,
+        }),
+
+        seenMessage: builder.mutation<Message, string>({
+            query: (messageId) => ({
+                url: `/chat/seen/${messageId}`,
+                method: 'PATCH',
+            }),
+
+            async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+                try {
+                    const result = await queryFulfilled;
+
+                    dispatch(
+                        chatApi.util.updateQueryData(
+                            'getConversation',
+                            result.data.conversationId,
+                            (draft) => {
+                                const message = draft.messages.find(
+                                    (m) => m._id === result.data._id
+                                );
+                                if (message) {
+                                    message.seen = true;
+                                }
+                            }
+                        )
+                    );
+
+                    dispatch(
+                        chatApi.util.updateQueryData(
+                            'getConversations',
+                            undefined,
+                            (draft) => {
+                                const conversation = draft.findIndex(
+                                    (c) => c._id === result.data.conversationId
+                                );
+                                // delete the conversation if it exists and move it to the top
+                                if (conversation !== -1) {
+                                    draft[conversation].lastMessage.seen = true;
+                                }
+                            }
+                        )
+                    );
+                } catch (err) {
+                    // console.log(err);
+                }
+            },
         }),
     }),
 });
 
 socket.on('disconnect', () => {
-    message.error('Disconnected from server. reconnecting...');
-    socketData.connected = false;
+    if (store.getState().auth.user) {
+        message.error('Disconnected from server. reconnecting...');
+        socketData.connected = false;
+    }
 });
 
 socket.on('connect', () => {
@@ -254,4 +315,5 @@ export const {
     useGetConversationQuery,
     useSendMessageMutation,
     useFindUserQuery,
+    useSeenMessageMutation,
 } = chatApi;

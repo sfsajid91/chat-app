@@ -16,6 +16,8 @@ export interface Conversation {
     lastMessage: {
         message: string;
         updatedAt: string;
+        seen: boolean;
+        sender: string;
     };
     createdAt: string;
     updatedAt: string;
@@ -28,4 +30,5 @@ export interface Message {
     message: string;
     createdAt: string;
     updatedAt: string;
+    seen: boolean;
 }

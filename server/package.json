@@ -1,7 +1,7 @@
 {
-    "name": "express-boilerplate",
+    "name": "chat-app-server",
     "version": "1.0.0",
-    "description": "This is a boilerplate for express app",
+    "description": "This is a server for mern chat app",
     "main": "app.js",
     "scripts": {
         "start": "node app.js",
@@ -10,7 +10,8 @@
     "keywords": [
         "express",
         "app",
-        "boilerplate"
+        "chat app",
+        "mern"
     ],
     "author": "Shaykh Farhan",
     "license": "ISC",

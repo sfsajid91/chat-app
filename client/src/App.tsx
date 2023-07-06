@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { Route, Routes } from 'react-router-dom';
 import Conversation from './components/Conversation';
 import EmptyConversation from './components/EmptyConversation';
@@ -14,6 +15,25 @@ function App() {
     const authChecked = useAuthCheck();
 
     if (!authChecked) return null;
+
+    moment.updateLocale('en', {
+        relativeTime: {
+            future: 'in %s',
+            past: '%s ago',
+            s: 'A seconds',
+            ss: '%d seconds',
+            m: 'A minute',
+            mm: '%d minutes',
+            h: 'An hour',
+            hh: '%d hours',
+            d: 'A day',
+            dd: '%d days',
+            M: 'A month',
+            MM: '%d months',
+            y: 'A year',
+            yy: '%d years',
+        },
+    });
 
     return (
         <Routes>

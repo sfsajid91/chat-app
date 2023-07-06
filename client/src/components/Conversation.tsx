@@ -49,18 +49,15 @@ const Conversation: React.FC = () => {
         }
     }, [messages]);
 
-    // const memoizedMessages = useMemo(
-    //     () =>
-    //         messages.map((mess) => (
-    //             <Message
-    //                 message={mess.message}
-    //                 sender={mess.sender === user?._id}
-    //                 updatedAt={mess.updatedAt}
-    //                 key={mess._id}
-    //             />
-    //         )),
-    //     [messages]
-    // );
+    // devide messages by date
+    const messagesByDate = messages.reduce((acc, message) => {
+        const date = moment(message.createdAt).format('MMMM D, YYYY');
+        if (!acc[date]) {
+            acc[date] = [];
+        }
+        acc[date].push(message);
+        return acc;
+    }, {} as { [key: string]: MessageTypes[] });
 
     return (
         <div className="w-full h-screen">
@@ -127,7 +124,7 @@ const Conversation: React.FC = () => {
                 <AnimatePresence>
                     {isTyping && <Typing />}
 
-                    {isSuccess &&
+                    {/* {isSuccess &&
                         data &&
                         messages.map((mess) => (
                             <Message
@@ -136,6 +133,31 @@ const Conversation: React.FC = () => {
                                 updatedAt={mess.updatedAt}
                                 key={mess._id}
                             />
+                        ))} */}
+
+                    {/* render messages by date */}
+                    {isSuccess &&
+                        data &&
+                        Object.keys(messagesByDate).map((date) => (
+                            <div
+                                key={date}
+                                className="flex flex-col gap-4 relative"
+                            >
+                                <div className="text-center text-white font-bold text-sm my-4 sticky top-0 z-20">
+                                    <span className="px-4 py-2 bg-blue-400 rounded-lg">
+                                        {date}
+                                    </span>
+                                </div>
+                                <div className="flex flex-col-reverse gap-4">
+                                    {messagesByDate[date].map((mess) => (
+                                        <Message
+                                            messageObj={mess}
+                                            sender={mess.sender === user?._id}
+                                            key={mess._id}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
                         ))}
                 </AnimatePresence>
             </div>

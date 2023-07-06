@@ -1,4 +1,5 @@
 import apiSlice from '../api/apiSlice';
+import { socket } from '../chat/chatApi';
 import { userLoggedIn } from './authSlice';
 
 type RegisterCredentials = {
@@ -43,6 +44,8 @@ export const authApi = apiSlice.injectEndpoints({
                         'auth',
                         JSON.stringify({ accessToken, user })
                     );
+
+                    socket.connect();
                 } catch (err) {
                     // do nothing
                 }

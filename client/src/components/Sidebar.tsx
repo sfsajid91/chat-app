@@ -14,6 +14,7 @@ import { useAppSelector } from '../app/hooks';
 import { store } from '../app/store';
 import apiSlice from '../features/api/apiSlice';
 import { selectUser, userLoggedOut } from '../features/auth/authSlice';
+import { socket } from '../features/chat/chatApi';
 import type { User } from '../types/Types';
 
 const { Sider } = Layout;
@@ -33,6 +34,7 @@ const onClick: MenuProps['onClick'] = ({ key }) => {
             store.dispatch(userLoggedOut());
             localStorage.clear();
             store.dispatch(apiSlice.util.resetApiState());
+            socket.disconnect();
             message.success('Logged out successfully');
             break;
 

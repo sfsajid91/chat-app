@@ -4,6 +4,7 @@ const {
     getAllMessages,
     sendMessage,
     searchUser,
+    seenMessage,
 } = require('../controllers/chatController');
 const { sendMessageValidator } = require('../validators/messageValidator');
 
@@ -12,5 +13,6 @@ router.get('/', getAllConversations);
 router.get('/search', searchUser);
 router.get('/:conversationId', getAllMessages);
 router.post('/', sendMessageValidator, sendMessage);
+router.patch('/seen/:messageId', seenMessage);
 
 module.exports = router;
