@@ -299,15 +299,20 @@ socket.on('disconnect', () => {
 });
 
 socket.on('connect', () => {
-    if (!socketData.firstConnection) {
+    if (store.getState().auth.user) {
         message.success('Connection restored.');
+        socketData.connected = true;
+
+        if (!socketData.firstConnection) {
+            message.success('Connection restored.');
+        }
+        const userId = store.getState().auth.user?._id;
+        if (userId && isValidObjectId(userId)) {
+            socket.emit('online', userId);
+        }
+        socketData.firstConnection = false;
+        socketData.connected = true;
     }
-    const userId = store.getState().auth.user?._id;
-    if (userId && isValidObjectId(userId)) {
-        socket.emit('online', userId);
-    }
-    socketData.firstConnection = false;
-    socketData.connected = true;
 });
 
 export const {
