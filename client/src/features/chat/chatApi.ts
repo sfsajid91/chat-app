@@ -300,9 +300,6 @@ socket.on('disconnect', () => {
 
 socket.on('connect', () => {
     if (store.getState().auth.user) {
-        message.success('Connection restored.');
-        socketData.connected = true;
-
         if (!socketData.firstConnection) {
             message.success('Connection restored.');
         }

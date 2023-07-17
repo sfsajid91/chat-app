@@ -221,7 +221,7 @@ export default function Registration() {
                                     loading={isLoading}
                                     block
                                 >
-                                    SignUp
+                                    Signup
                                 </Button>
                             </Form.Item>
                         </Form>

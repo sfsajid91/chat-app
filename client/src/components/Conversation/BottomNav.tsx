@@ -1,5 +1,6 @@
+import type { InputRef } from 'antd';
 import { Button, Form, Input } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { IoSendSharp } from 'react-icons/io5';
 import { socket, useSendMessageMutation } from '../../features/chat/chatApi';
 
@@ -11,6 +12,7 @@ interface BottomNavProps {
 const BottomNav = ({ receiver, conversationId }: BottomNavProps) => {
     const [form] = Form.useForm();
     const message = Form.useWatch('message', form);
+    const inputRef = useRef<InputRef>(null);
 
     const [isTyping, setIsTyping] = useState(false);
 
@@ -24,11 +26,11 @@ const BottomNav = ({ receiver, conversationId }: BottomNavProps) => {
             setIsTyping(false);
         }
 
-        const timeout2 = setTimeout(() => {
+        const timeout = setTimeout(() => {
             setIsTyping(false);
         }, 2000);
         return () => {
-            clearTimeout(timeout2);
+            clearTimeout(timeout);
         };
     }, [message]);
 
@@ -36,7 +38,16 @@ const BottomNav = ({ receiver, conversationId }: BottomNavProps) => {
         socket.emit('typing', isTyping, conversationId);
     }, [isTyping]);
 
-    const [sendMessage, { isLoading }] = useSendMessageMutation();
+    const [sendMessage, { isLoading, data: sentMessage }] =
+        useSendMessageMutation();
+
+    useEffect(() => {
+        if (inputRef.current) {
+            inputRef.current.focus({
+                cursor: 'end',
+            });
+        }
+    }, [sentMessage]);
 
     const handleSendMessage = (values: { message: string }) => {
         form.resetFields();
@@ -50,20 +61,35 @@ const BottomNav = ({ receiver, conversationId }: BottomNavProps) => {
         sendMessage(data);
     };
 
+    // if the key press is enter then submit the form if shift + enter or ctrl + enter then add a new line
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
+            e.preventDefault();
+        }
+
+        if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && message) {
+            form.submit();
+        }
+    };
+
     return (
         <>
-            <nav className="h-14 w-full px-4 py-2 border-t flex items-center bg-white z-20">
+            <nav className="px-4 py-2 border bg-white z-20 overflow-none h-fit">
                 <Form
                     form={form}
-                    className="w-full flex"
+                    className="w-full flex items-center h-full"
                     onFinish={handleSendMessage}
                 >
                     <Form.Item name="message" className="!py-0 !my-0 !w-full">
-                        <Input
+                        <Input.TextArea
                             size="large"
-                            className="!w-full"
-                            style={{ borderRadius: '999px' }}
+                            className="!w-full !border-blue-500"
+                            style={{ borderRadius: '10px', resize: 'none' }}
                             placeholder="Aa"
+                            rows={1}
+                            onKeyDown={handleKeyDown}
+                            ref={inputRef}
+                            autoSize={{ minRows: 1, maxRows: 4 }}
                         />
                     </Form.Item>
 

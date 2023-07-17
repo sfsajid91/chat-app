@@ -1,3 +1,4 @@
+import type { User } from '../../types/Types';
 import apiSlice from '../api/apiSlice';
 import { socket } from '../chat/chatApi';
 import { userLoggedIn } from './authSlice';
@@ -51,7 +52,46 @@ export const authApi = apiSlice.injectEndpoints({
                 }
             },
         }),
+
+        updateName: builder.mutation<User, string>({
+            query: (name) => ({
+                url: '/profile/name',
+                method: 'PATCH',
+                body: { name },
+            }),
+
+            async onQueryStarted(_arg, { queryFulfilled, dispatch, getState }) {
+                try {
+                    const result = await queryFulfilled;
+                    const user = result.data as User;
+
+                    const accessToken = getState().auth.accessToken;
+
+                    dispatch(userLoggedIn({ user, accessToken }));
+
+                    localStorage.setItem(
+                        'auth',
+                        JSON.stringify({ accessToken, user })
+                    );
+                } catch (err) {
+                    // do nothing
+                }
+            },
+        }),
+
+        updatePassword: builder.mutation({
+            query: (body) => ({
+                url: '/profile/password',
+                method: 'PATCH',
+                body: body,
+            }),
+        }),
     }),
 });
 
-export const { useLoginMutation, useRegisterMutation } = authApi;
+export const {
+    useLoginMutation,
+    useRegisterMutation,
+    useUpdateNameMutation,
+    useUpdatePasswordMutation,
+} = authApi;

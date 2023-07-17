@@ -60,7 +60,7 @@ const Conversation: React.FC = () => {
     }, {} as { [key: string]: MessageTypes[] });
 
     return (
-        <div className="w-full h-screen">
+        <div className="w-full h-screen flex flex-col">
             <Helmet>
                 <title>{getSender(conversation, user)?.name} | Chat App</title>
             </Helmet>
@@ -98,7 +98,7 @@ const Conversation: React.FC = () => {
                                 .avatarColor,
                         }}
                     >
-                        {getSender(conversation, user)?.name[0]}
+                        {getSender(conversation, user)?.name[0].toUpperCase()}
                     </Avatar>
                 </Badge>
                 <div className="flex flex-col m2l-4">
@@ -119,21 +119,11 @@ const Conversation: React.FC = () => {
             {/* Conversation section  */}
             <div
                 ref={divRef}
-                className="h-[calc(100vh-7.5rem)] p-8 overflow-y-auto flex flex-col-reverse gap-4"
+                // className="h-[calc(100vh-7.5rem)] p-8 overflow-y-auto flex flex-col-reverse gap-4"
+                className="p-8 overflow-y-auto flex-grow flex flex-col-reverse gap-4"
             >
                 <AnimatePresence>
                     {isTyping && <Typing />}
-
-                    {/* {isSuccess &&
-                        data &&
-                        messages.map((mess) => (
-                            <Message
-                                message={mess.message}
-                                sender={mess.sender === user?._id}
-                                updatedAt={mess.updatedAt}
-                                key={mess._id}
-                            />
-                        ))} */}
 
                     {/* render messages by date */}
                     {isSuccess &&
@@ -161,7 +151,6 @@ const Conversation: React.FC = () => {
                         ))}
                 </AnimatePresence>
             </div>
-
             {/* bottom nav  */}
             <BottomNav
                 receiver={getSender(conversation, user).email}

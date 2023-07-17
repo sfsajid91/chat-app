@@ -9,7 +9,7 @@ import {
     AiOutlineSetting,
 } from 'react-icons/ai';
 import { BsChatDots } from 'react-icons/bs';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAppSelector } from '../app/hooks';
 import { store } from '../app/store';
 import apiSlice from '../features/api/apiSlice';
@@ -27,30 +27,36 @@ const dropdownMenuItems: MenuProps['items'] = [
     { key: 'logout', label: 'Logout', icon: <AiOutlineLogout /> },
 ];
 
-// dropdown menu onClick handler
-const onClick: MenuProps['onClick'] = ({ key }) => {
-    switch (key) {
-        case 'logout':
-            store.dispatch(userLoggedOut());
-            localStorage.clear();
-            store.dispatch(apiSlice.util.resetApiState());
-            socket.disconnect();
-            message.success('Logged out successfully');
-            break;
-
-        default:
-            break;
-    }
-};
-
 const Sidebar: React.FC = () => {
     const params = useParams() as { conversationId: string };
     const [collapsed, setCollapsed] = useState(true);
 
     const user = useAppSelector(selectUser) as User;
 
+    const navigate = useNavigate();
+
     const toggleCollapsed = () => {
         setCollapsed(!collapsed);
+    };
+
+    // dropdown menu onClick handler
+    const onClick: MenuProps['onClick'] = ({ key }) => {
+        switch (key) {
+            case 'logout':
+                store.dispatch(userLoggedOut());
+                localStorage.clear();
+                store.dispatch(apiSlice.util.resetApiState());
+                socket.disconnect();
+                message.success('Logged out successfully');
+                break;
+
+            case 'settings':
+                navigate('/settings');
+                break;
+
+            default:
+                break;
+        }
     };
 
     return (

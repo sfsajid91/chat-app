@@ -20,6 +20,9 @@ const userSchema = new mongoose.Schema(
         picture: {
             type: String,
         },
+        path: {
+            type: String,
+        },
         avatarColor: {
             type: String,
             required: true,

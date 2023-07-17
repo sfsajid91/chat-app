@@ -7,6 +7,7 @@ import Chat from './pages/Chat';
 import GoogleOauth from './pages/GoogleOauth';
 import Login from './pages/Login';
 import Registration from './pages/Registration';
+import Settings from './pages/Settings';
 import EmptyRoute from './routes/EmptyRoute';
 import PrivateRoute from './routes/PrivateRoute';
 import PublicRoute from './routes/PublicRoute';
@@ -38,6 +39,7 @@ function App() {
     return (
         <Routes>
             <Route path="" element={<PrivateRoute />}>
+                <Route path="/settings" element={<Settings />} />
                 <Route path="/" element={<Chat />}>
                     <Route index element={<EmptyConversation />} />
                     <Route

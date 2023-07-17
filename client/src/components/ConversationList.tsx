@@ -10,20 +10,20 @@ const { Title } = Typography;
 
 const ConversationList: React.FC = () => {
     const params = useParams() as { conversationId: string };
-    const [value, setValue] = useState('');
-    const [search, setSearch] = useState('');
+    const [value, setValue] = useState<string>('');
+    const [search, setSearch] = useState<string>('');
 
     // debouncing the search
     useEffect(() => {
         const timeoutId = setTimeout(() => {
-            setSearch(value);
+            setSearch(value.trim());
         }, 500);
 
         return () => clearTimeout(timeoutId);
     }, [value]);
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setValue(e.target.value.trim());
+        setValue(e.target.value);
     };
 
     return (
