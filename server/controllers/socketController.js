@@ -17,36 +17,40 @@ const configureSocket = (server) => {
         // listen for online status
         socket.on('online', async (userId) => {
             if (!userId) return;
-            const user = await User.findOneAndUpdate(
-                { _id: userId },
-                {
-                    activeStatus: {
-                        status: true,
+            try {
+                const user = await User.findOneAndUpdate(
+                    { _id: userId },
+                    {
+                        activeStatus: {
+                            status: true,
+                        },
                     },
-                },
-                {
-                    new: true,
-                }
-            )
-                .lean()
-                .exec();
+                    {
+                        new: true,
+                    }
+                )
+                    .lean()
+                    .exec();
 
-            delete user.password;
+                delete user.password;
 
-            const userConversations = await Conversation.find({
-                participants: {
-                    $in: [userId],
-                },
-            })
-                .select({
-                    _id: 1,
+                const userConversations = await Conversation.find({
+                    participants: {
+                        $in: [userId],
+                    },
                 })
-                .lean()
-                .exec();
+                    .select({
+                        _id: 1,
+                    })
+                    .lean()
+                    .exec();
 
-            socket.user = user;
+                socket.user = user;
 
-            socket.broadcast.emit('userUpdate', user, userConversations);
+                socket.broadcast.emit('userUpdate', user, userConversations);
+            } catch (error) {
+                console.error(error);
+            }
         });
 
         socket.on('typing', (isTyping, conversationId) => {
@@ -58,41 +62,41 @@ const configureSocket = (server) => {
 
             if (!userId) return;
 
-            // try {
-            //     // Update activeStatus to false and set lastSeen to current time
-            const user = await User.findOneAndUpdate(
-                { _id: userId },
-                {
-                    activeStatus: {
-                        status: false,
-                        lastSeen: new Date(),
+            try {
+                //     // Update activeStatus to false and set lastSeen to current time
+                const user = await User.findOneAndUpdate(
+                    { _id: userId },
+                    {
+                        activeStatus: {
+                            status: false,
+                            lastSeen: new Date(),
+                        },
                     },
-                },
-                {
-                    new: true,
-                }
-            )
-                .lean()
-                .exec();
+                    {
+                        new: true,
+                    }
+                )
+                    .lean()
+                    .exec();
 
-            delete user.password;
+                delete user.password;
 
-            const userConversations = await Conversation.find({
-                participants: {
-                    $in: [userId],
-                },
-            })
-                .select({
-                    _id: 1,
+                const userConversations = await Conversation.find({
+                    participants: {
+                        $in: [userId],
+                    },
                 })
-                .lean()
-                .exec();
+                    .select({
+                        _id: 1,
+                    })
+                    .lean()
+                    .exec();
 
-            // Emit the updated user data to other clients if needed
-            socket.broadcast.emit('userUpdate', user, userConversations);
-            // } catch (error) {
-            //     console.error(error);
-            // }
+                // Emit the updated user data to other clients if needed
+                socket.broadcast.emit('userUpdate', user, userConversations);
+            } catch (error) {
+                console.error(error);
+            }
         });
     });
 
