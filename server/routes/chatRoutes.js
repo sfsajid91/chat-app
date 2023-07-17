@@ -11,8 +11,8 @@ const { sendMessageValidator } = require('../validators/messageValidator');
 router.get('/', getAllConversations);
 // search user by name by query string
 router.get('/search', searchUser);
+router.patch('/seen/:messageId', seenMessage);
 router.get('/:conversationId', getAllMessages);
 router.post('/', sendMessageValidator, sendMessage);
-router.patch('/seen/:messageId', seenMessage);
 
 module.exports = router;
