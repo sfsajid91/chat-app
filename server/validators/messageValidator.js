@@ -7,9 +7,9 @@ const sendMessageValidator = [
         .withMessage('Message is required.'),
 
     body('receiverEmail')
+        .trim()
         .isEmail()
-        .withMessage('Please enter a valid email address.')
-        .normalizeEmail(),
+        .withMessage('Please enter a valid email address.'),
 ];
 
 module.exports = { sendMessageValidator };

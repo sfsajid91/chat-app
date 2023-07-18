@@ -2,9 +2,9 @@ const { body } = require('express-validator');
 
 const signupValidator = [
     body('email')
+        .trim()
         .isEmail()
-        .withMessage('Please enter a valid email address.')
-        .normalizeEmail(),
+        .withMessage('Please enter a valid email address.'),
 
     body('password')
         .isLength({ min: 8 })
@@ -21,16 +21,16 @@ const signupValidator = [
 
 const loginValidator = [
     body('email')
+        .trim()
         .isEmail()
-        .withMessage('Please enter a valid email address.')
-        .normalizeEmail(),
+        .withMessage('Please enter a valid email address.'),
 ];
 
 const forgotPassValidator = [
     body('email')
+        .trim()
         .isEmail()
-        .withMessage('Please enter a valid email address.')
-        .normalizeEmail(),
+        .withMessage('Please enter a valid email address.'),
 ];
 
 module.exports = { signupValidator, loginValidator, forgotPassValidator };
